@@ -162,9 +162,15 @@ xcopy /I /Y "$(ProjectDir)data" "$(TargetDir)data\"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="game.c" />
+    <ClCompile Include="level.c" />
+    <ClCompile Include="main.c" />
+    <ClCompile Include="parser.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="game.h" />
+    <ClInclude Include="level.h" />
+    <ClInclude Include="parser.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
