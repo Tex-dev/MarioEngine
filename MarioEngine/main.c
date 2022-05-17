@@ -27,18 +27,6 @@ Game* Init(const char* levelPath)
 		return NULL;
 	}
 
-	
-	int nbJoystick = SDL_NumJoysticks();
-	controller = SDL_GameControllerOpen(1);
-	if (!controller)
-		fprintf(stderr, "Could not open gamecontroller %i: %s\n", 1, SDL_GetError());
-	else
-	{
-		joystick = SDL_GameControllerGetJoystick(controller);
-		instanceID = SDL_JoystickInstanceID(joystick);
-	}
-
-
 	return LoadGame(levelPath);
 }
 
@@ -323,9 +311,9 @@ int main(int argc, char* argv[])
 	SDL_Rect srcRect, dstRect;
 
 	int i, j;
-	int posX = 61, posY = 0;
+	int posX = 41, posY = 6;
 	int animID = 0;
-	int nbSprite = 4;
+	int nbSprite = 3;
 
 	// Gear		: x=22	y=12	nb=4
 	// Roulette : x=41	y=6		nb=3

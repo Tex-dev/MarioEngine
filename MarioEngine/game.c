@@ -2,6 +2,7 @@
 
 Game* LoadGame(const char* levelPath)
 {
+	int nbJoystick, i;
 	Game* res = NULL;
 	res = (Game*)calloc(1, sizeof(Game));
 	if (!res)
@@ -19,6 +20,25 @@ Game* LoadGame(const char* levelPath)
 	SDL_SetRenderDrawColor(res->renderer, 0, 0, 0, 255);
 	SDL_SetRenderDrawColor(res->renderer, 0, 0, 255, 255);
 
+	res->controller = NULL;
+	res->joystick = NULL;
+	res->instanceID = 0;
+
+	nbJoystick = SDL_NumJoysticks();
+	for (i = 0; i < nbJoystick; i++)
+	{
+		if (SDL_IsGameController(i))
+		{
+			res->controller = SDL_GameControllerOpen(i);
+			if (res->controller)
+			{
+				res->joystick = SDL_GameControllerGetJoystick(res->controller);
+				res->instanceID = SDL_JoystickInstanceID(res->joystick);
+				break;
+			}
+		}
+	}
+	
 	res->level = LoadLevel(levelPath, res->renderer);
 
 	return res;
