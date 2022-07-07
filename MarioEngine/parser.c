@@ -10,8 +10,9 @@ element* NextLine(FILE* file, const char* seps)
 	char* word = NULL;
 	char* line = NULL;
 	char isLine = 0;
-	int lenght;
+	int length;
 	int index;
+	int i;
 
 	if (!file)
 		return NULL;
@@ -22,18 +23,27 @@ element* NextLine(FILE* file, const char* seps)
 
 	while (!isLine)
 	{
-		int err = ReadLine(file, &line);
+		length = ReadLine(file, &line);
 
-		if (err < 0)
+		if (length < 0)
 			return NULL;
 
-		if (err > 0 && line && line[0] != '#')
+		if (length > 0 && line && line[0] != '#')
 			isLine = 1;
 		else
 			free(line);
 	}
 
 //	printf("%s\n", line);
+	
+	for (i = 0; i < length; i++)
+	{
+		if (line[i] == '#')
+		{
+			line[i] = '\0';
+			break;
+		}
+	}
 
 	result = (element*)calloc(1, sizeof(element));
 	if (!result)
@@ -41,11 +51,11 @@ element* NextLine(FILE* file, const char* seps)
 	result->nbValue = 0;
 
 
-	lenght = strlen(line);
-	copyLine = (char*)calloc(lenght + 1, sizeof(char));
+	length = strlen(line);
+	copyLine = (char*)calloc(length + 1, sizeof(char));
 	if (!copyLine)
 		return NULL;
-	strcpy_s(copyLine, lenght+1, line);
+	strcpy_s(copyLine, length+1, line);
 	
 	word = strtok_s(copyLine, seps, &context);
 	word = strtok_s(NULL, seps, &context);
@@ -78,17 +88,17 @@ element* NextLine(FILE* file, const char* seps)
 
 
 
-
+	/*
 	word = strtok_s(line, seps, &context);
 	word = strtok_s(NULL, seps, &context);
 	index = 0;
 	while (word)
 	{
-		lenght = strlen(word);
-		result->value[index] = (char*)calloc(lenght + 1, sizeof(char));
+		length = strlen(word);
+		result->value[index] = (char*)calloc(length + 1, sizeof(char));
 		if (!result->value[index])
 			return result;
-		strcpy_s(result->value[index], lenght, word);
+		strcpy_s(result->value[index], length, word);
 
 		word = strtok_s(NULL, seps, &context);
 		index++;
@@ -96,7 +106,7 @@ element* NextLine(FILE* file, const char* seps)
 
 	free(line);
 
-	return result;
+	return result;//*/
 }
 
 int ReadLine(FILE* file, char** line)

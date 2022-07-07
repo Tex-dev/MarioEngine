@@ -175,9 +175,12 @@ xcopy /I /Y "$(ProjectDir)data" "$(TargetDir)data\"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\lvl1-1.conf" />
+    <None Include="data\player.conf" />
     <None Include="data\sprite.conf" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="data\mario-luigi-4.png" />
+    <Image Include="data\smb3_physics.png" />
     <Image Include="data\Stage_tiles.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

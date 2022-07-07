@@ -6,6 +6,19 @@
 
 #include <Windows.h>
 
+void usleep(__int64 usec)
+{
+	HANDLE timer;
+	LARGE_INTEGER ft;
+
+	ft.QuadPart = -(10 * usec); // Convert to 100 nanosecond interval, negative value indicates relative time
+
+	timer = CreateWaitableTimer(NULL, TRUE, NULL);
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0);
+	WaitForSingleObject(timer, INFINITE);
+	CloseHandle(timer);
+}
+
 #define _GAME
 //#define _SPRITE_VALUE
 //#define _TEST
@@ -27,6 +40,12 @@ Game* Init(const char* levelPath)
 		return NULL;
 	}
 
+	if (TTF_Init())
+	{
+		printf("[-] ERROR - Failed to initialise SDL_TTF (%s)\n", SDL_GetError());
+		return NULL;
+	}
+
 	return LoadGame(levelPath);
 }
 
@@ -34,6 +53,7 @@ int Interaction(Game* game)
 {
 	SDL_Event e;
 	int quit = 0;
+	static unsigned char ctrl=0, shift=0, alt=0;
 
 	while (SDL_PollEvent(&e))
 	{
@@ -43,12 +63,31 @@ int Interaction(Game* game)
 			quit = 1;
 			break;
 
+		case SDL_KEYUP:
+			switch (e.key.keysym.sym)
+			{
+				case SDLK_LCTRL:
+				case SDLK_RCTRL:
+					ctrl = 0;
+					break;
+			}
+			break;
 
 		case SDL_KEYDOWN:
 			switch (e.key.keysym.sym)
 			{
 				case SDLK_ESCAPE:
 					quit = 1;
+					break;
+
+				case SDLK_d:
+					if(ctrl)
+						game->showDebug = !game->showDebug;
+					break;
+
+				case SDLK_LCTRL:
+				case SDLK_RCTRL:
+					ctrl=1;
 					break;
 
 				//*
@@ -75,7 +114,10 @@ int Interaction(Game* game)
 		default:
 			break;
 		}
+
 	}
+
+//	printf("ctrl: %d\r", ctrl);
 
 	return quit;
 }
@@ -83,6 +125,7 @@ int Interaction(Game* game)
 #ifdef _GAME
 int main(int argc, char** argv)
 {
+	Uint32 beginFrame, endFrame;
 	Uint32 oldTime, time;
 	double deltaTime;
 	Game* game;
@@ -90,14 +133,25 @@ int main(int argc, char** argv)
 	if (!(game = Init("./data/lvl1-1.conf")))
 		return EXIT_FAILURE;
 
+	double duration_60 = 1.0 / 60.0 * 1000.0;
+	double duration_50 = 1.0 / 50.0 * 1000.0;
+	double duration;
+
+	printf("60FPS, frame duration: %f\n", 1.0 / 60.0 * 1000.0);
+	printf("50FPS, frame duration: %f\n", 1.0 / 50.0 * 1000.0);
+
+	
+
 //	lvl = LoadLevel("./data/lvl1-1.conf");
 	oldTime = SDL_GetTicks();
 	while (!Interaction(game))
 	{
+		beginFrame = SDL_GetTicks();
 		//*
-		time = SDL_GetTicks();
+		time = beginFrame;
 		deltaTime = (time - oldTime)/1000.0;
-		printf("FPS : %d                            \r", (int)(1.0/deltaTime));
+		game->fps = (int)(1.0 / deltaTime);
+//		printf("FPS : %14d\r", (int)(1.0/deltaTime));
 		oldTime = time;//*/
 
 		/*
@@ -106,7 +160,17 @@ int main(int argc, char** argv)
 		SDL_RenderPresent(g_renderer);//*/
 		DrawGame(game);
 
-		Sleep(16);
+//		Sleep(1);
+		endFrame = SDL_GetTicks();
+
+		duration = duration_60 - (endFrame - beginFrame);
+		duration *= 1000;
+
+//		printf("FPS: %4d - Duration: %f                           \r", (int)(1.0 / deltaTime), duration);
+		if(duration>0)
+			usleep(duration);
+
+		game->nbFrame++;
 	}
 
 	/*
@@ -141,6 +205,7 @@ int main(int argc, char** argv)
 	//*/
 	FreeGame(game);
 
+	TTF_Quit();
 	SDL_Quit();
 
 	return EXIT_SUCCESS;
@@ -311,16 +376,16 @@ int main(int argc, char* argv[])
 	SDL_Rect srcRect, dstRect;
 
 	int i, j;
-	int posX = 41, posY = 6;
+	int posX = 61, posY = 0;
 	int animID = 0;
-	int nbSprite = 3;
+	int nbSprite = 4;
 
-	// Gear		: x=22	y=12	nb=4
-	// Roulette : x=41	y=6		nb=3
-	// Muncher	: x=55	y=0		nb=3
-	// Coin		: x=56	y=4		nb=3
-	// Brick	: x=61	y=0		nb=4
-	// ?-block	: x=67	y=0		nb=4
+	// Gear		: x=22	y=12	nb=4		id: 
+	// Roulette : x=41	y=6		nb=3		id: 479
+	// Muncher	: x=55	y=0		nb=3		id: 
+	// Coin		: x=56	y=4		nb=3		id: 348
+	// Brick	: x=61	y=0		nb=4		id: 61
+	// ?-block	: x=67	y=0		nb=4		id: 67
 
 	if (!SDL_WasInit(SDL_INIT_VIDEO))
 	{

@@ -49,6 +49,11 @@ Level* LoadLevel(const char* path, SDL_Renderer* renderer)
                 tiles->marginX = atoi(elemt->value[5]);
                 tiles->marginY = atoi(elemt->value[6]);
 
+                tiles->nbAnimSprites = atoi(elemt->value[7]);
+                tiles->animSprites = (AnimatedTile*)calloc(tiles->nbAnimSprites, sizeof(AnimatedTile));
+                if (!tiles->animSprites)
+                    printf("[-] ERROR - Error during the allocation of the array of animated sprites\n");
+
                 res->tiles = tiles;
 
                 break;
@@ -108,6 +113,34 @@ Level* LoadLevel(const char* path, SDL_Renderer* renderer)
                 break;
             }
 
+            case 'a':
+            {
+                int animID = atoi(elemt->value[0]);
+
+                if (!res->tiles || !res->tiles->animSprites)
+                    break;
+
+                if (animID >= res->tiles->nbAnimSprites)
+                {
+                    printf("[-] ERROR - Animated sprites %d is out of array size.\n", animID);
+                    break;
+                }
+
+                res->tiles->animSprites[animID].duration = atoi(elemt->value[1]);
+                res->tiles->animSprites[animID].nbTiles = elemt->nbValue - 2;
+                res->tiles->animSprites[animID].tiles = (int*)calloc(res->tiles->animSprites[animID].nbTiles, sizeof(int));
+                if (!res->tiles->animSprites[animID].tiles)
+                {
+                    printf("[-] ERROR - Error during the allocation of the animated sprites with id %d.\n", animID);
+                    break;
+                }
+
+                for (i = 2; i < elemt->nbValue; i++)
+                    res->tiles->animSprites[animID].tiles[i - 2] = atoi(elemt->value[i]);
+
+                break;
+            }
+
             default:
                 break;
         }
@@ -120,12 +153,15 @@ Level* LoadLevel(const char* path, SDL_Renderer* renderer)
     return res;
 }
 
-void DrawLevel(Level* lvl, SDL_Renderer* renderer, int posX, int posY)
+void DrawLevel(Level* lvl, SDL_Renderer* renderer, int posX, int posY, Uint32 frameID)
 {
     int nbSpriteX, nbSpriteY;
+    int nbSpritesInSheet;
     SDL_Rect bkgdRect;
     int begX, begY;
     int i, j, k;
+
+    nbSpritesInSheet = lvl->tiles->sizeX * lvl->tiles->sizeY;
 
     nbSpriteX = RES_X / 16;
     nbSpriteY = RES_Y / 16;
@@ -161,8 +197,21 @@ void DrawLevel(Level* lvl, SDL_Renderer* renderer, int posX, int posY)
             {
                 if (lvl->spriteID[begX + i][begY + j][k] > -1)
                 {
-                    int posX = lvl->spriteID[begX + i][begY + j][k] % lvl->tiles->sizeX;
-                    int posY = lvl->spriteID[begX + i][begY + j][k] / lvl->tiles->sizeX;
+                    int posX;
+                    int posY;
+
+                    if (lvl->spriteID[begX + i][begY + j][k] >= nbSpritesInSheet)                // It's an animated sprites
+                    {
+                        AnimatedTile at = lvl->tiles->animSprites[lvl->spriteID[begX + i][begY + j][k] - nbSpritesInSheet];
+
+                        posX = at.tiles[(frameID/at.duration)%at.nbTiles] % lvl->tiles->sizeX;
+                        posY = at.tiles[(frameID/at.duration)%at.nbTiles] / lvl->tiles->sizeX;
+                    }
+                    else                                                                        // It's a static sprites
+                    {
+                        posX = lvl->spriteID[begX + i][begY + j][k] % lvl->tiles->sizeX;
+                        posY = lvl->spriteID[begX + i][begY + j][k] / lvl->tiles->sizeX;
+                    }
 
                     //TODO : On dessine le sprite
                     srcRect.x = posX * (lvl->tiles->resX + lvl->tiles->marginX) + lvl->tiles->marginX;

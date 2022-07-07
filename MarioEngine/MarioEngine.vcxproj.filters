@@ -35,6 +35,9 @@
     <None Include="data\lvl1-1.conf">
       <Filter>Fichiers de ressources</Filter>
     </None>
+    <None Include="data\player.conf">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="utils.h">
@@ -52,6 +55,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="data\Stage_tiles.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="data\mario-luigi-4.png">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="data\smb3_physics.png">
       <Filter>Fichiers de ressources</Filter>
     </Image>
   </ItemGroup>
