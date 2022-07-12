@@ -129,11 +129,11 @@ int Interaction(Game* game)
 
 				/*
 				case SDLK_UP:
-//					game->level->playerPosY++;
+					game->level->playerPosY++;
 					break;
 
 				case SDLK_DOWN:
-//					game->level->playerPosY = min(game->level->sizeY - 1, max(0, game->level->playerPosY - 1));
+					game->level->playerPosY = min(game->level->sizeY - 1, max(0, game->level->playerPosY - 1));
 					break;
 
 				case SDLK_LEFT:
@@ -185,6 +185,52 @@ int Interaction(Game* game)
 //			std::cout << "posX : " << posX << " - posY : " << posY << " === " << posY * 73 + posX << "     \r";
 //			printf("posX : %d - posY : %d === %d     \r", posX, posY, posY * 73 + posX);//*/
 			break;
+
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+//			printf("[DEBUG] Button : %d\n", e.jbutton.button);
+			switch (e.jbutton.button)
+			{
+				case 0:
+					game->input = (e.jbutton.type == SDL_JOYBUTTONDOWN) ? game->input | INPUT_A : game->input & (0xFF - INPUT_A);
+					break;
+
+				case 2:
+					game->input = (e.jbutton.type == SDL_JOYBUTTONDOWN) ? game->input | INPUT_B : game->input & (0xFF - INPUT_B);
+					break;
+
+				case 6:
+					game->input = (e.jbutton.type == SDL_JOYBUTTONDOWN) ? game->input | INPUT_SELECT : game->input & (0xFF - INPUT_SELECT);
+					break;
+
+				case 7:
+					game->input = (e.jbutton.type == SDL_JOYBUTTONDOWN) ? game->input | INPUT_START : game->input & (0xFF - INPUT_START);
+					break;
+			}
+			break;
+
+		/*
+		case SDL_JOYAXISMOTION:
+			// Movement of axis
+			printf("Movement of axis\n");
+			printf("%d is the new value of the axis %d for the joystick %d\n", e.jaxis.value, e.jaxis.axis, e.jaxis.which);
+			break;//*/
+
+		case SDL_JOYHATMOTION:
+		{
+			unsigned char value = game->input & (INPUT_A | INPUT_B | INPUT_START | INPUT_SELECT);
+			if (e.jhat.value & SDL_HAT_LEFT)
+				value |= INPUT_LEFT;
+			if (e.jhat.value & SDL_HAT_RIGHT)
+				value |= INPUT_RIGHT;
+			if (e.jhat.value & SDL_HAT_UP)
+				value |= INPUT_UP;
+			if (e.jhat.value & SDL_HAT_DOWN)
+				value |= INPUT_DOWN;
+
+			game->input = value;
+			break;
+		}
 
 		default:
 			break;

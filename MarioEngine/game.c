@@ -30,7 +30,7 @@ Game* LoadGame(const char* levelPath)
 	res->showDebug = 0;
 
 	res->input = 0;
-	res->showInput = 0;
+	res->showInput = 1;
 
 	res->controller = NULL;
 	res->joystick = NULL;
@@ -50,6 +50,14 @@ Game* LoadGame(const char* levelPath)
 			}
 		}
 	}
+	SDL_JoystickEventState(SDL_ENABLE);
+
+	printf("[DEBUG] Informations of joystick\n");
+	printf("[DEBUG]    Name: %s\n", SDL_JoystickName(0));
+	printf("[DEBUG]    Number of axes: %d\n", SDL_JoystickNumAxes(res->joystick));
+	printf("[DEBUG]    Number of hats: %d\n", SDL_JoystickNumHats(res->joystick));
+	printf("[DEBUG]    Number of trackballs: %d\n", SDL_JoystickNumBalls(res->joystick));
+	printf("[DEBUG]    Number of buttons: %d\n", SDL_JoystickNumButtons(res->joystick));
 	
 	res->level = LoadLevel(levelPath, res->renderer);
 
