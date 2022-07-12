@@ -70,6 +70,38 @@ int Interaction(Game* game)
 				case SDLK_RCTRL:
 					ctrl = 0;
 					break;
+
+				case SDLK_UP:
+					game->input &= (0xFF - INPUT_UP);
+					break;
+
+				case SDLK_DOWN:
+					game->input &= (0xFF - INPUT_DOWN);
+					break;
+
+				case SDLK_LEFT:
+					game->input &= (0xFF - INPUT_LEFT);
+					break;
+
+				case SDLK_RIGHT:
+					game->input &= (0xFF - INPUT_RIGHT);
+					break;
+
+				case SDLK_RETURN:
+					game->input &= (0xFF - INPUT_START);
+					break;
+
+				case SDLK_SPACE:
+					game->input &= (0xFF - INPUT_SELECT);
+					break;
+
+				case SDLK_w:
+					game->input &= (0xFF - INPUT_B);
+					break;
+
+				case SDLK_c:
+					game->input &= (0xFF - INPUT_A);
+					break;
 			}
 			break;
 
@@ -85,29 +117,72 @@ int Interaction(Game* game)
 						game->showDebug = !game->showDebug;
 					break;
 
+				case SDLK_i:
+					if(ctrl)
+						game->showInput = !game->showInput;
+					break;
+
 				case SDLK_LCTRL:
 				case SDLK_RCTRL:
 					ctrl=1;
 					break;
 
+				/*
+				case SDLK_UP:
+//					game->level->playerPosY++;
+					break;
+
+				case SDLK_DOWN:
+//					game->level->playerPosY = min(game->level->sizeY - 1, max(0, game->level->playerPosY - 1));
+					break;
+
+				case SDLK_LEFT:
+					game->level->playerPosX = min(game->level->sizeX - 1, max(0, game->level->playerPosX - 1));
+					break;
+
+				case SDLK_RIGHT:
+					game->player->posX++;
+					break;//*/
+
 				//*
 				case SDLK_UP:
 					game->level->playerPosY++;
+					game->input |= INPUT_UP;
 					break;
 
 				case SDLK_DOWN:
 					game->level->playerPosY = min(game->level->sizeY-1, max(0, game->level->playerPosY - 1));
+					game->input |= INPUT_DOWN;
 					break;
 
 				case SDLK_LEFT:
 					game->level->playerPosX = min(game->level->sizeX-1, max(0, game->level->playerPosX - 1));
+					game->input |= INPUT_LEFT;
 					break;
 
 				case SDLK_RIGHT:
 					game->level->playerPosX++;
+					game->input |= INPUT_RIGHT;
 					break;//*/
+
+				case SDLK_RETURN:
+					game->input |= INPUT_START;
+					break;
+
+				case SDLK_SPACE:
+					game->input |= INPUT_SELECT;
+					break;
+
+				case SDLK_w:
+					game->input |= INPUT_B;
+					break;
+
+				case SDLK_c:
+					game->input |= INPUT_A;
+					break;
 			}
-//				std::cout << "posX : " << posX << " - posY : " << posY << " === " << posY * 73 + posX << "     \r";
+
+//			std::cout << "posX : " << posX << " - posY : " << posY << " === " << posY * 73 + posX << "     \r";
 //			printf("posX : %d - posY : %d === %d     \r", posX, posY, posY * 73 + posX);//*/
 			break;
 
@@ -130,6 +205,11 @@ int main(int argc, char** argv)
 	double deltaTime;
 	Game* game;
 
+	// TODO: Player Test
+	SDL_Surface* playerSur;
+	SDL_Texture* playerTex;
+	SDL_Rect srcRect = { 1, 16, 16, 16 };
+
 	if (!(game = Init("./data/lvl1-1.conf")))
 		return EXIT_FAILURE;
 
@@ -140,7 +220,12 @@ int main(int argc, char** argv)
 	printf("60FPS, frame duration: %f\n", 1.0 / 60.0 * 1000.0);
 	printf("50FPS, frame duration: %f\n", 1.0 / 50.0 * 1000.0);
 
-	
+
+	// TODO: Player Test
+	playerSur = IMG_Load("./data/mario-luigi-4.png");
+	SDL_SetColorKey(playerSur, SDL_TRUE, SDL_MapRGB(playerSur->format, 224, 163, 216));
+	playerTex = SDL_CreateTextureFromSurface(game->renderer, playerSur);
+	SDL_FreeSurface(playerSur);
 
 //	lvl = LoadLevel("./data/lvl1-1.conf");
 	oldTime = SDL_GetTicks();

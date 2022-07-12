@@ -37,6 +37,7 @@ Level* LoadLevel(const char* path, SDL_Renderer* renderer)
                 SDL_Surface* img = IMG_Load(elemt->value[0]);
                 SDL_SetColorKey(img, SDL_TRUE, SDL_MapRGB(img->format, 224, 163, 216));
                 tiles->sprites = SDL_CreateTextureFromSurface(renderer, img);
+                SDL_FreeSurface(img);
                 if (!tiles->sprites)
                     printf("[-] ERROR - Failed to load texture (%s)\n", SDL_GetError());
 
@@ -222,7 +223,17 @@ void DrawLevel(Level* lvl, SDL_Renderer* renderer, int posX, int posY, Uint32 fr
             }//*/
 
             if (begX + i == posX && begY + j == posY)
+            {
                 SDL_RenderDrawRect(renderer, &destRect);
+
+                for (int x = -3; x < 3; x++)
+                {
+                    for (int y = -3; y < 3; y++)
+                    {
+                        SDL_RenderDrawPoint(renderer, destRect.x + destRect.w / 2 + x, destRect.y + destRect.h / 2 + y);
+                    }
+                }
+            }
         }
     }
 }
