@@ -166,11 +166,15 @@ xcopy /I /Y "$(ProjectDir)data" "$(TargetDir)data\"</Command>
     <ClCompile Include="level.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="parser.c" />
+    <ClCompile Include="player.c" />
+    <ClCompile Include="debug.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="debug.h" />
     <ClInclude Include="game.h" />
     <ClInclude Include="level.h" />
     <ClInclude Include="parser.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,5 @@
 #include "game.h"
 
-void DisplayDebugInfos(Game* game);
 void DisplayInput(Game* game);
 
 Game* LoadGame(const char* levelPath)
@@ -23,8 +22,7 @@ Game* LoadGame(const char* levelPath)
 	SDL_SetRenderDrawColor(res->renderer, 0, 0, 0, 255);
 	SDL_SetRenderDrawColor(res->renderer, 0, 0, 255, 255);
 
-//	res->font = TTF_OpenFont("./data/ARLRDBD.TTF", 16);
-	res->font = TTF_OpenFont("./data/consola.TTF", 16);
+	res->font = TTF_OpenFont("./data/consola.TTF", 4*MULTIPLIER);
 	res->fps = 0;
 	res->nbFrame = 0;
 	res->showDebug = 0;
@@ -60,86 +58,50 @@ Game* LoadGame(const char* levelPath)
 	printf("[DEBUG]    Number of buttons: %d\n", SDL_JoystickNumButtons(res->joystick));
 	
 	res->level = LoadLevel(levelPath, res->renderer);
+	res->player = LoadPlayer(res->level->playerPosX * res->level->tiles->resX, res->level->playerPosX * res->level->tiles->resY);
 
 	return res;
 }
 
 void UpdateGame(Game* game)
 {
+	unsigned char move = 1;
 
+	if (game->input & INPUT_B)
+		move = 4;
 
-}
+	if (game->input & INPUT_LEFT)
+		game->player->posX = min(game->level->tiles->resX * (game->level->sizeX - 1), max(0, game->player->posX - move));
 
-void DisplayDebugInfos(Game* game)
-{
-	static SDL_Color color = { 255, 0, 0 };
-	SDL_Texture *texFPS, *texFrame, *texILabel, *texInput;
-	char fps[255] = "Salut", frame[255] = "coucou", input[255], iLabel[255];
-	SDL_Surface* surface;
-	SDL_Rect dstRect = {0};
-	int texW = 0;
-	int texH = 0;
+	if (game->input & INPUT_RIGHT)
+		game->player->posX = min(game->level->tiles->resX * (game->level->sizeX - 1), max(0, game->player->posX + move));
 
-	sprintf_s(fps, 255, "%u fps", game->fps);
-	sprintf_s(frame, 255, "%u frames", game->nbFrame);
-	sprintf_s(iLabel, 255, "input: B A SE ST  R L D U");
-	sprintf_s(input, 255, "       %c %c  %c  %c  %c %c %c %c",	game->input & INPUT_B ? '1' : '0',
-																						game->input & INPUT_A ? '1' : '0',
-																						game->input & INPUT_SELECT ? '1' : '0',
-																						game->input & INPUT_START ? '1' : '0',
-																						game->input & INPUT_RIGHT ? '1' : '0',
-																						game->input & INPUT_LEFT ? '1' : '0',
-																						game->input & INPUT_DOWN ? '1' : '0',
-																						game->input & INPUT_UP ? '1' : '0');
+	if (game->input & INPUT_UP)
+		game->player->posY = min(game->level->tiles->resY * (game->level->sizeY - 1), max(0, game->player->posY + move));
 
-	surface = TTF_RenderText_Blended(game->font, fps, color);
-	texFPS = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);
+	if (game->input & INPUT_DOWN)
+		game->player->posY = min(game->level->tiles->resY * (game->level->sizeY - 1), max(0, game->player->posY - move));
 
-	surface = TTF_RenderText_Blended(game->font, frame, color);
-	texFrame = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);
+	if (game->input & INPUT_SELECT && game->input & INPUT_START)
+	{
+		game->player->posX = game->level->playerPosX * game->level->tiles->resX;
+		game->player->posY = game->level->playerPosY * game->level->tiles->resY;
+	}
 
-	surface = TTF_RenderText_Blended(game->font, iLabel, color);
-	texILabel = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);
+	AddMessageInDebug("input: B A SE ST  R L D U");
+	AddMessageInDebug("       %c %c  %c  %c  %c %c %c %c",	game->input & INPUT_B ? '1' : '0',
+															game->input & INPUT_A ? '1' : '0',
+															game->input & INPUT_SELECT ? '1' : '0',
+															game->input & INPUT_START ? '1' : '0',
+															game->input & INPUT_RIGHT ? '1' : '0',
+															game->input & INPUT_LEFT ? '1' : '0',
+															game->input & INPUT_DOWN ? '1' : '0',
+															game->input & INPUT_UP ? '1' : '0');
 
-	surface = TTF_RenderText_Blended(game->font, input, color);
-	texInput = SDL_CreateTextureFromSurface(game->renderer, surface);
-	SDL_FreeSurface(surface);
+//		game->player->posX = min(game->level->sizeX - 1, max(0, game->player->posX + 1));
+//		game->player->posX++;
 
-
-	dstRect.x = 8;
-	dstRect.y = 0;
-
-
-	SDL_QueryTexture(texFPS, NULL, NULL, &texW, &texH);
-	dstRect.w = texW;
-	dstRect.h = texH;
-	SDL_RenderCopy(game->renderer, texFPS, NULL, &dstRect);
-
-	dstRect.y += texH;
-	SDL_QueryTexture(texFrame, NULL, NULL, &texW, &texH);
-	dstRect.w = texW;
-	dstRect.h = texH;
-	SDL_RenderCopy(game->renderer, texFrame, NULL, &dstRect);
-
-	dstRect.y += texH;
-	SDL_QueryTexture(texILabel, NULL, NULL, &texW, &texH);
-	dstRect.w = texW;
-	dstRect.h = texH;
-	SDL_RenderCopy(game->renderer, texILabel, NULL, &dstRect);
-
-	dstRect.y += texH;
-	SDL_QueryTexture(texInput, NULL, NULL, &texW, &texH);
-	dstRect.w = texW;
-	dstRect.h = texH;
-	SDL_RenderCopy(game->renderer, texInput, NULL, &dstRect);
-
-	SDL_DestroyTexture(texILabel);
-	SDL_DestroyTexture(texInput);
-	SDL_DestroyTexture(texFrame);
-	SDL_DestroyTexture(texFPS);
+	UpdateLevel(game->level, game->player);
 }
 
 void DisplayInput(Game* game)
@@ -264,10 +226,14 @@ void DisplayInput(Game* game)
 
 void DrawGame(Game* game)
 {
-	SDL_RenderClear(game->renderer);	
-	DrawLevel(game->level, game->renderer, game->level->playerPosX, game->level->playerPosY, game->nbFrame);
+	SDL_RenderClear(game->renderer);
+
+//	DrawLevel(game->level, game->renderer, game->level->playerPosX, game->level->playerPosY, game->nbFrame);
+	DrawLevel(game->level, game->renderer, game->player, game->nbFrame);
+	DrawPlayer(game->player, game->renderer, game->level);
+
 	if (game->showDebug)
-		DisplayDebugInfos(game);
+		DisplayDebugMessages(game->renderer, game->font);
 	if(game->showInput)
 		DisplayInput(game);
 

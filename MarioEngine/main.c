@@ -144,26 +144,21 @@ int Interaction(Game* game)
 					game->player->posX++;
 					break;//*/
 
-				//*
 				case SDLK_UP:
-					game->level->playerPosY++;
 					game->input |= INPUT_UP;
 					break;
 
 				case SDLK_DOWN:
-					game->level->playerPosY = min(game->level->sizeY-1, max(0, game->level->playerPosY - 1));
 					game->input |= INPUT_DOWN;
 					break;
 
 				case SDLK_LEFT:
-					game->level->playerPosX = min(game->level->sizeX-1, max(0, game->level->playerPosX - 1));
 					game->input |= INPUT_LEFT;
 					break;
 
 				case SDLK_RIGHT:
-					game->level->playerPosX++;
 					game->input |= INPUT_RIGHT;
-					break;//*/
+					break;
 
 				case SDLK_RETURN:
 					game->input |= INPUT_START;
@@ -209,13 +204,6 @@ int Interaction(Game* game)
 			}
 			break;
 
-		/*
-		case SDL_JOYAXISMOTION:
-			// Movement of axis
-			printf("Movement of axis\n");
-			printf("%d is the new value of the axis %d for the joystick %d\n", e.jaxis.value, e.jaxis.axis, e.jaxis.which);
-			break;//*/
-
 		case SDL_JOYHATMOTION:
 		{
 			unsigned char value = game->input & (INPUT_A | INPUT_B | INPUT_START | INPUT_SELECT);
@@ -231,6 +219,13 @@ int Interaction(Game* game)
 			game->input = value;
 			break;
 		}
+
+		/*
+		case SDL_JOYAXISMOTION:
+			// Movement of axis
+			printf("Movement of axis\n");
+			printf("%d is the new value of the axis %d for the joystick %d\n", e.jaxis.value, e.jaxis.axis, e.jaxis.which);
+			break;//*/
 
 		default:
 			break;
@@ -282,8 +277,13 @@ int main(int argc, char** argv)
 		time = beginFrame;
 		deltaTime = (time - oldTime)/1000.0;
 		game->fps = (int)(1.0 / deltaTime);
-//		printf("FPS : %14d\r", (int)(1.0/deltaTime));
+		
+		AddMessageInDebug("%u fps", game->fps);
+		AddMessageInDebug("%u frames", game->nbFrame);
+
 		oldTime = time;//*/
+
+		UpdateGame(game);
 
 		/*
 		SDL_RenderClear(g_renderer);
@@ -299,8 +299,9 @@ int main(int argc, char** argv)
 
 //		printf("FPS: %4d - Duration: %f                           \r", (int)(1.0 / deltaTime), duration);
 		if(duration>0)
-			usleep(duration);
+			usleep((long long)duration);
 
+		ClearDebugMessages();
 		game->nbFrame++;
 	}
 

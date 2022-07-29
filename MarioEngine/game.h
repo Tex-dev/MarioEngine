@@ -1,6 +1,7 @@
 #pragma once
 
 #include "level.h"
+#include "player.h"
 
 typedef enum eInput
 {
@@ -32,6 +33,7 @@ typedef struct sGame
 	int					instanceID;
 
 	Level *				level;
+	Player *			player;
 }Game;
 
 Game* LoadGame(const char * levelPath);
