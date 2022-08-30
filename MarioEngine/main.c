@@ -6,6 +6,20 @@
 
 #include <Windows.h>
 
+#define _GAME
+//#define _SPRITE_VALUE
+//#define _TEST
+
+#define _60HZ
+
+#ifdef _50HZ
+	#define FRAME_DURATION	(1.0 / 50.0 * 1000.0)
+#else
+	#ifdef _60HZ
+		#define FRAME_DURATION	(1.0 / 60.0 * 1000.0)
+	#endif
+#endif
+
 void usleep(__int64 usec)
 {
 	HANDLE timer;
@@ -18,10 +32,6 @@ void usleep(__int64 usec)
 	WaitForSingleObject(timer, INFINITE);
 	CloseHandle(timer);
 }
-
-#define _GAME
-//#define _SPRITE_VALUE
-//#define _TEST
 
 Game* Init(const char* levelPath)
 {
@@ -243,6 +253,7 @@ int main(int argc, char** argv)
 {
 	Uint32 beginFrame, endFrame;
 	Uint32 oldTime, time;
+	Uint32 deltaTimeMilli;
 	double deltaTime;
 	Game* game;
 
@@ -254,13 +265,12 @@ int main(int argc, char** argv)
 	if (!(game = Init("./data/lvl1-1.conf")))
 		return EXIT_FAILURE;
 
-	double duration_60 = 1.0 / 60.0 * 1000.0;
-	double duration_50 = 1.0 / 50.0 * 1000.0;
+//	double duration_60 = 1.0 / 60.0 * 1000.0;
+//	double duration_50 = 1.0 / 50.0 * 1000.0;
 	double duration;
 
-	printf("60FPS, frame duration: %f\n", 1.0 / 60.0 * 1000.0);
-	printf("50FPS, frame duration: %f\n", 1.0 / 50.0 * 1000.0);
-
+//	printf("60FPS, frame duration: %f\n", 1.0 / 60.0 * 1000.0);
+//	printf("50FPS, frame duration: %f\n", 1.0 / 50.0 * 1000.0);
 
 	// TODO: Player Test
 	playerSur = IMG_Load("./data/mario-luigi-4.png");
@@ -275,6 +285,7 @@ int main(int argc, char** argv)
 		beginFrame = SDL_GetTicks();
 		//*
 		time = beginFrame;
+		deltaTimeMilli = time - oldTime;
 		deltaTime = (time - oldTime)/1000.0;
 		game->fps = (int)(1.0 / deltaTime);
 		
@@ -294,12 +305,13 @@ int main(int argc, char** argv)
 //		Sleep(1);
 		endFrame = SDL_GetTicks();
 
-		duration = duration_60 - (endFrame - beginFrame);
-		duration *= 1000;
+		duration = FRAME_DURATION - (endFrame - beginFrame);
+//		duration *= 1000;
 
 //		printf("FPS: %4d - Duration: %f                           \r", (int)(1.0 / deltaTime), duration);
-		if(duration>0)
-			usleep((long long)duration);
+		if (duration > 0)
+			Sleep(duration);
+//			usleep((long long)duration);
 
 		ClearDebugMessages();
 		game->nbFrame++;

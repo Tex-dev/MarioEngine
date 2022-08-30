@@ -364,21 +364,6 @@ void DrawLevel(Level* lvl, SDL_Renderer* renderer, Player* player, Uint32 frameI
         }
     }
 
-
-    SDL_Rect srcRect, destRect;
-    destRect.w = lvl->tiles->resX * MULTIPLIER;
-    destRect.h = lvl->tiles->resY * MULTIPLIER;
-    destRect.x = 0;
-    destRect.y = -destRect.h / 2;
-
-    srcRect.w = lvl->tiles->resX;
-    srcRect.h = lvl->tiles->resY;
-    srcRect.x = 0;
-    srcRect.y = 0;
-
-    SDL_RenderCopy(renderer, lvl->tiles->sprites, &srcRect, &destRect);
-
-
     /*
 //    int nbSpriteX, nbSpriteY;
 //    int nbSpritesInSheet;
