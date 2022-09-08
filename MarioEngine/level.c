@@ -469,6 +469,13 @@ void FreeLevel(Level* lvl)
 
     if (lvl->tiles)
     {
+        if (lvl->tiles->animSprites)
+        {
+            for (i = 0; i < lvl->tiles->nbAnimSprites; i++)
+                free(lvl->tiles->animSprites[i].tiles);
+        }
+
+        free(lvl->tiles->animSprites);
         SDL_DestroyTexture(lvl->tiles->sprites);
         free(lvl->tiles);
     }

@@ -243,6 +243,7 @@ void DrawGame(Game* game)
 void FreeGame(Game* game)
 {
 	FreeLevel(game->level);
+	free(game->player);
 
 	TTF_CloseFont(game->font);
 	SDL_DestroyRenderer(game->renderer);
