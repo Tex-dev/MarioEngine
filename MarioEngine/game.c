@@ -65,29 +65,6 @@ Game* LoadGame(const char* levelPath)
 
 void UpdateGame(Game* game)
 {
-	unsigned char move = 1;
-
-	if (game->input & INPUT_B)
-		move = 4;
-
-	if (game->input & INPUT_LEFT)
-		game->player->posX = min(game->level->tiles->resX * (game->level->sizeX - 1), max(0, game->player->posX - move));
-
-	if (game->input & INPUT_RIGHT)
-		game->player->posX = min(game->level->tiles->resX * (game->level->sizeX - 1), max(0, game->player->posX + move));
-
-	if (game->input & INPUT_UP)
-		game->player->posY = min(game->level->tiles->resY * (game->level->sizeY - 1), max(0, game->player->posY + move));
-
-	if (game->input & INPUT_DOWN)
-		game->player->posY = min(game->level->tiles->resY * (game->level->sizeY - 1), max(0, game->player->posY - move));
-
-	if (game->input & INPUT_SELECT && game->input & INPUT_START)
-	{
-		game->player->posX = game->level->playerPosX * game->level->tiles->resX;
-		game->player->posY = game->level->playerPosY * game->level->tiles->resY;
-	}
-
 	AddMessageInDebug("input: B A SE ST  R L D U");
 	AddMessageInDebug("       %c %c  %c  %c  %c %c %c %c",	game->input & INPUT_B ? '1' : '0',
 															game->input & INPUT_A ? '1' : '0',
@@ -101,6 +78,7 @@ void UpdateGame(Game* game)
 //		game->player->posX = min(game->level->sizeX - 1, max(0, game->player->posX + 1));
 //		game->player->posX++;
 
+	UpdatePlayer(game->player, game->level, game->input);
 	UpdateLevel(game->level, game->player);
 }
 

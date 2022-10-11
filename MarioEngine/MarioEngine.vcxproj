@@ -168,6 +168,7 @@ xcopy /I /Y "$(ProjectDir)data" "$(TargetDir)data\"</Command>
     <ClCompile Include="parser.c" />
     <ClCompile Include="player.c" />
     <ClCompile Include="debug.c" />
+    <ClCompile Include="value.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="debug.h" />
@@ -176,6 +177,7 @@ xcopy /I /Y "$(ProjectDir)data" "$(TargetDir)data\"</Command>
     <ClInclude Include="parser.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="value.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\lvl1-1.conf" />

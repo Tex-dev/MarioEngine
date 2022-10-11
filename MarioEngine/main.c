@@ -262,6 +262,19 @@ int main(int argc, char** argv)
 	SDL_Texture* playerTex;
 	SDL_Rect srcRect = { 1, 16, 16, 16 };
 
+	/*
+	Value v = Short2Value(MAX_VELOCITY_RUNNING);
+	short s = Value2Short(v);
+
+	v = Short2Value(MAX_VELOCITY_WALKING);
+	s = Value2Short(v);
+
+	v = Short2Value(ACCELERATION);
+	s = Value2Short(v);
+
+	v = Short2Value(SKID_DECELERATION_NORMAL);
+	s = Value2Short(v);//*/
+
 	if (!(game = Init("./data/lvl1-1.conf")))
 		return EXIT_FAILURE;
 
@@ -310,7 +323,7 @@ int main(int argc, char** argv)
 
 //		printf("FPS: %4d - Duration: %f                           \r", (int)(1.0 / deltaTime), duration);
 		if (duration > 0)
-			Sleep(duration);
+			Sleep((DWORD)duration);
 //			usleep((long long)duration);
 
 		ClearDebugMessages();

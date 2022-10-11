@@ -3,18 +3,6 @@
 #include "level.h"
 #include "player.h"
 
-typedef enum eInput
-{
-	INPUT_UP		= 0b00000001,
-	INPUT_DOWN		= 0b00000010,
-	INPUT_LEFT		= 0b00000100,
-	INPUT_RIGHT		= 0b00001000,
-	INPUT_START		= 0b00010000,
-	INPUT_SELECT	= 0b00100000,
-	INPUT_A			= 0b01000000,
-	INPUT_B			= 0b10000000,
-}Input;
-
 typedef struct sGame
 {
 	SDL_Window *		window;
